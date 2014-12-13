@@ -62,7 +62,11 @@ function nextGeneration(boids) {
     var newBoids = [];
     var neighbors = boidTree.nearest(boid, numBoids, attractionRadius);
     if (neighbors.length == 1) {
-      newBoids.push(boid);
+      newBoids.push({
+        x: boid.rotation.x,
+        y: boid.rotation.y,
+        z: boid.rotation.z,
+      });
       continue
     }
 
@@ -73,7 +77,12 @@ function nextGeneration(boids) {
       neighbor = neighbors[j][0];
 
       if (neighbor == boid) {
-        continue;
+        newBoids.push({
+          x: boid.rotation.x,
+          y: boid.rotation.y,
+          z: boid.rotation.z,
+        });
+        continue
       }
 
       cohesion.x += neighbor.position.x;
@@ -121,21 +130,24 @@ function nextGeneration(boids) {
       z: (cohesion.z + alignment.z + separation.z)/3,
     }
     newDirection = normalize(newDirection);
-    boid.position.x = newDirection.x;
-    boid.position.y = newDirection.y;
-    boid.position.z = newDirection.z;
 
-    newBoids.push(boid)
+    newBoids.push({
+      x: newDirection.x,
+      y: newDirection.y,
+      z: newDirection.z,
+    });
   }
-  return newBoids;
+  for (i in newBoids) {
+    boids[i].rotation.x = newBoids[i].x;
+    boids[i].rotation.y = newBoids[i].y;
+    boids[i].rotation.z = newBoids[i].z;
+  }
 }
 
-var boids = constructBoids(numBoids);
-
-var boidTree = initTree(boids);
-
-var t0 = new Date();
-boids = nextGeneration(boids);
-initTree(boids);
-var t1 = new Date();
-p(t1 - t0);
+//var boids = constructBoids(numBoids);
+boids = boids.map(function (x) {
+  x.x = x.position.x;
+  x.y = x.position.y;
+  x.z = x.position.z;
+  return x;
+});

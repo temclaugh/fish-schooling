@@ -8,7 +8,7 @@
 
   <script type="text/javascript">
 
-
+  var numBoids = 50;
   var lastMouseX = 0;
   var lastMouseY = 0;
 
@@ -18,24 +18,26 @@
     var controls;
 
     function animate() {
+
+      var boidTree = initTree(boids);
+      boids = nextGeneration(boids);
+
       requestAnimationFrame(animate);
       for (var i = boids.length - 1; i >= 0; i--) {
 
-          boids[i].rotateY((Math.random() - .5)/40);
-          boids[i].rotateX((Math.random() - .5)/40);
-          boids[i].rotateZ((Math.random() - .3)/40)
+          // boids[i].rotateY((Math.random() - .5)/40);
+          // boids[i].rotateX((Math.random() - .5)/40);
+          // boids[i].rotateZ((Math.random() - .3)/40)
 
           boids[i].translateY(-.1);
+
+          // if (i == 2) {
+          //   console.log("X: " +boids[i].position.x);
+          //   console.log("Y: " +boids[i].position.y);
+          //   console.log("Z: " +boids[i].position.z);
+          // }
       };
 
-      //
-      //boid.translateY(Math.PI/40);
-      //boid.position.y += -Math.PI/40;
-      // pyramid1.rotateY(Math.PI/180);
-      // pyramid1.translateZ(Math.PI/180);
-      // sphere.rotateY(Math.PI/180);
-      // cube.rotateY(Math.PI/180);
-      // multi.rotateY(Math.PI/480);
       renderer.render(scene, camera);
       //camera.rotateY(Math.PI/1720);
       //camera.translateX(Math.PI/180);
@@ -44,36 +46,6 @@
       //   console.log("moving forward");
       //   camera.translateZ(-Math.PI/180);
       // }
-
-      // if (controls.moveBackward) {
-      //   console.log("moving backward");
-      //   camera.translateZ(Math.PI/180);
-      // }
-
-      // if (controls.moveRight) {
-      //   console.log("moving right");
-      //   camera.translateX(Math.PI/180);
-      // }
-
-      // if (controls.moveLeft) {
-      //   console.log("moving left");
-      //   camera.translateX(-Math.PI/180);
-      // }
-
-      // deltaX = controls.mouseX - lastMouseX;
-      // deltaY = controls.mouseY - lastMouseY;
-      // console.log("XCHANGE: " + deltaX);
-      // lastMouseX = controls.mouseX;
-      // lastMouseY = controls.mouseY;
-
-      // if (deltaX == 0.0 && deltaY == 0.0) {
-      //   controls.lookSpeed = .0001;
-      // }
-      // else {
-      //   controls.lookSpeed = .1;
-      // }
-
-      //camera.lookAt(new THREE.Vector3(controls.mouseX, controls.mouseY,0));
 
       controls.update(clock.getDelta());
 
@@ -109,7 +81,7 @@
     var boids = [];
     var boidbox = new THREE.Object3D();
 
-    for(var i = 0; i < 20; i++) {
+    for(var i = 0; i < numBoids; i++) {
       loader.load('low-poly-plane.dae', function(result) {
         var idx = boids.length;
         boids[idx] = result.scene;
@@ -140,47 +112,15 @@
 
     var light = new THREE.DirectionalLight(0xe0e0e0);
     light.position.set(5,2,5).normalize();
-    light.castShadow = false;
-    light.shadowDarkness = 0.0;
-    light.shadowCameraRight = 5;
-    light.shadowCameraLeft = -5;
-    light.shadowCameraTop = 5;
-    light.shadowCameraBottom = -5;
-    light.shadowCameraNear = 2;
-    light.shadowCameraFar = 100;
 
     var light2 = new THREE.DirectionalLight(0xe0e0e0);
     light2.position.set(-5,-2,5).normalize();
-    light.castShadow = false;
-    light.shadowDarkness = 0.0;
-    light.shadowCameraRight = 5;
-    light.shadowCameraLeft = -5;
-    light.shadowCameraTop = 5;
-    light.shadowCameraBottom = -5;
-    light.shadowCameraNear = 2;
-    light.shadowCameraFar = 100;
 
     var light3 = new THREE.DirectionalLight(0xe0e0e0);
     light3.position.set(5,-2,-5).normalize();
-    light.castShadow = false;
-    light.shadowDarkness = 0.0;
-    light.shadowCameraRight = 5;
-    light.shadowCameraLeft = -5;
-    light.shadowCameraTop = 5;
-    light.shadowCameraBottom = -5;
-    light.shadowCameraNear = 2;
-    light.shadowCameraFar = 100;
 
     var light4 = new THREE.DirectionalLight(0xe0e0e0);
     light4.position.set(-5,2,-5).normalize();
-    light.castShadow = false;
-    light.shadowDarkness = 0.0;
-    light.shadowCameraRight = 5;
-    light.shadowCameraLeft = -5;
-    light.shadowCameraTop = 5;
-    light.shadowCameraBottom = -5;
-    light.shadowCameraNear = 2;
-    light.shadowCameraFar = 100;
 
     var scene = new THREE.Scene();
     scene.add(floor);

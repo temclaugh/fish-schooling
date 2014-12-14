@@ -1,6 +1,7 @@
-var numBoids = 200;
-var attractionRadius = 20.0;
+var numBoids = 20;
+var attractionRadius = 1000.0;
 var repulsionRadius = attractionRadius / 10;
+
 var p = function (x) { console.log(x); };
 
 function vectorLength(v) {
@@ -12,7 +13,7 @@ function normalize(v) {
   return {x: v.x/len, y: v.y/len, z: v.z/len};
 }
 
-function constructBoids(count) {
+function initBoids(boids) {
 
   function randInt() { return Math.floor(200 * Math.random() - 100); }
 
@@ -20,30 +21,16 @@ function constructBoids(count) {
   var ys = [37, 13, 76, 31, -14, 67, 35, 17, -25, -16, -44, 91, -19, -38, -70, -38, 57, -93, -88, -58, 72, -93, 97, 82, -43, -24, -62, -31, -43, 40, -83, 64, 40, -32, -77, -9, -61, 11, 50, -2, -59, -34, -9, 86, -96, -27, -92, -74, 33, 45, -49, 16, -37, -55, -23, 85, -3, -64, 33, 22, 13, 5, 14, 98, 61, -86, -92, -16, 50, -41, -30, -62, -71, 10, 41, 58, -40, 40, 69, -46, 29, -43, 78, 19, 34, -69, 30, 39, 48, 65, -24, 44, -51, -99, 33, 32, -93, 87, 89, 12];
   var zs = [94, -9, -79, -17, 76, -56, 91, 19, 54, 15, 36, -17, -4, -71, -49, -61, 68, 69, 44, -13, -13, 14, 15, -12, 66, -88, -61, -98, 95, -41, -54, 95, 49, 54, -34, 98, -53, -88, 14, 83, -55, 37, 94, 46, 24, -97, -37, -91, -12, 29, -34, -94, -83, -87, 97, 19, -79, -70, 77, 32, 40, 21, 99, 82, 4, -12, 17, -16, 88, 71, -31, 86, 79, 89, -12, -35, -16, 30, 85, -58, 100, -8, -74, 69, -4, -65, -85, 16, 42, -100, 87, -54, 21, 60, 75, -71, 37, 63, -37, 44];
 
-  var boids = [];
-
   var randDirection = function() {
     var rand = function () { return 2 * Math.random() - 1; };
     var v = {x: rand(), y: rand(), z: rand()};
     return normalize(v);
   };
-
-  for (var i = 0; i < count; ++i) {
-    var boid = {
-      position: {x: randInt(), y: randInt(), z: randInt()},
-      rotation: randDirection(),
-    };
-    boids.push(boid);
+  for (i in boids) {
+    boids[i].x = boids[i].position.x;
+    boids[i].y = boids[i].position.y;
+    boids[i].z = boids[i].position.z;
   }
-
-  boids = boids.map(function (x) {
-    x.x = x.position.x;
-    x.y = x.position.y;
-    x.z = x.position.z;
-    return x;
-  });
-
-  return boids;
 }
 
 function distance(a, b) {
@@ -57,6 +44,7 @@ function initTree(boids) {
 }
 
 function nextGeneration(boids) {
+  var boidTree = initTree(boids);
   for (i in boids) {
     var boid = boids[i];
     var newBoids = [];
@@ -77,12 +65,7 @@ function nextGeneration(boids) {
       neighbor = neighbors[j][0];
 
       if (neighbor == boid) {
-        newBoids.push({
-          x: boid.rotation.x,
-          y: boid.rotation.y,
-          z: boid.rotation.z,
-        });
-        continue
+        continue;
       }
 
       cohesion.x += neighbor.position.x;
@@ -107,6 +90,7 @@ function nextGeneration(boids) {
       y: cohesion.y/n,
       z: cohesion.z/n,
     };
+    // if (i == 0) console.log(cohesion);
     alignment = {
       x: alignment.x/n,
       y: alignment.y/n,
@@ -117,19 +101,25 @@ function nextGeneration(boids) {
       y: separation.y/n - boid.position.y,
       z: separation.z/n - boid.position.z,
     };
-    p([cohesion, alignment, separation]);
 
-    cohesion = normalize(cohesion);
     alignment = normalize(alignment);
     separation = normalize(separation);
 
-
+    // newDirection = {
+    //   x: (cohesion.x + alignment.x + separation.x)/3,
+    //   y: (cohesion.y + alignment.y + separation.y)/3,
+    //   z: (cohesion.z + alignment.z + separation.z)/3,
+    // }
     newDirection = {
-      x: (cohesion.x + alignment.x + separation.x)/3,
-      y: (cohesion.y + alignment.y + separation.y)/3,
-      z: (cohesion.z + alignment.z + separation.z)/3,
+      x: cohesion.x,
+      y: cohesion.y,
+      z: cohesion.z,
     }
-    newDirection = normalize(newDirection);
+    var oldRotation = {x: boid.rotation.x, y: boid.rotation.y, z: boid.rotation.z};
+    boid.lookAt(new THREE.Vector3(cohesion.x, cohesion.y, cohesion.z), boid.rotation.x);
+    var newRotation = {x: boid.rotation.x, y: boid.rotation.y, z: boid.rotation.z};
+    // console.log(oldRotation, cohesion, newRotation);
+    console.log(boid.up);
 
     newBoids.push({
       x: newDirection.x,
@@ -137,6 +127,7 @@ function nextGeneration(boids) {
       z: newDirection.z,
     });
   }
+
   for (i in newBoids) {
     boids[i].rotation.x = newBoids[i].x;
     boids[i].rotation.y = newBoids[i].y;
@@ -144,6 +135,7 @@ function nextGeneration(boids) {
   }
 }
 
+/*
 //var boids = constructBoids(numBoids);
 boids = boids.map(function (x) {
   x.x = x.position.x;
@@ -151,3 +143,4 @@ boids = boids.map(function (x) {
   x.z = x.position.z;
   return x;
 });
+*/

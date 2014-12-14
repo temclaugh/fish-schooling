@@ -53,8 +53,7 @@ function getAlignment(boid, neighbors, limit) {
 }
 
 function getSeparation(boid, neighbors, mul) {
-  var separation = getAlignment(boid, neighbors, repulsionRadius);
-  return {x: -1 * mul * separation.x, y: -1 * mul * separation.y, z: -1 * mul * separation.z};
+  return getCohesion(boid, neighbors, -1*mul);
 }
 
 function getCohesion(boid, neighbors, mul) {
@@ -109,8 +108,10 @@ function nextGeneration(boids) {
 
     // var alignment = boid.rotation;
     var alignment = getAlignment(boid, neighbors, attractionRadius);
-    var cohesion = getCohesion(boid, neighbors, .05);
-    var separation = getSeparation(boid, neighbors, .25);
+    var cohesion = getCohesion(boid, neighbors, 2);
+
+    var close_neighbors = boidTree.nearest(boid, numBoids, repulsionRadius);
+    var separation = getSeparation(boid, close_neighbors, .25);
 
     newBoids.push({
       x: (boid.rotation.x + cohesion.x + alignment.x)/3,

@@ -6,6 +6,15 @@ var boidsLoaded = false;
 var skyLoaded = false;
 var vecLenMax = .2;
 
+var yMin = -78;
+var yMax = 92;
+
+var xMin = -85;
+var xMax = 85;
+
+var zMin = -81;
+var zMax = 89;
+
 function draw3D()  {
   var controls;
 
@@ -27,7 +36,16 @@ function draw3D()  {
         boids[i].position.x += boids[i].vel.x;
         boids[i].position.y += boids[i].vel.y;
         boids[i].position.z += boids[i].vel.z;
-        p("X: " + boids[i].vel.x + " Y: " + boids[i].vel.y + " Z: " + boids[i].vel.z);
+
+        if (boids[i].position.x > xMax || boids[i].position.x < xMin) {
+          boids[i].vel.x *= -1;
+        }
+        if (boids[i].position.y > yMax || boids[i].position.y < yMin) {
+          boids[i].vel.y *= -1;
+        }
+        if (boids[i].position.z > zMax || boids[i].position.z < zMin) {
+          boids[i].vel.z *= -1;
+        }
     };
 
     renderer.render(scene, camera);
@@ -136,8 +154,8 @@ function draw3D()  {
   var div = document.getElementById("shapecanvas2");
 
   var renderer = new THREE.WebGLRenderer();
-  var scale = .7;
-  renderer.setSize(scale * 1920, scale * 900);
+  var scale = .96;
+  renderer.setSize(scale * window.innerWidth, scale * window.innerHeight);
   renderer.setClearColor(0x000000, 1);
   renderer.shadowMapEnabled = true;
   div.appendChild( renderer.domElement );

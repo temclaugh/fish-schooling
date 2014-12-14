@@ -24,7 +24,7 @@
 
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <!-- <link rel="icon" type="image/png" href="images/favicon.png" /> -->
 
 </head>
 <body>
@@ -35,7 +35,10 @@
     <div class="row">
       <div class="one-half column" style="margin-top: 10%">
         <h4>3D Boids</h4>
-        <p>The boids algorithm describes the movement patterns exhibited by groups of animals with just a few simple rules. Groups such as schools of fish and flocks of birds have clusters of individuals whose velocity at a given moment can be predicted by the velocity of the indivudals surrounding them.</p>
+        <p>The boids algorithm describes the movement patterns exhibited by groups of animals with just a few simple rules. Groups such as schools of fish and flocks of birds have clusters of individuals whose velocity at a given moment is determined by the velocities of the indivudals surrounding them. This algorithm was invented by Craig Reynolds in 1986.</p>
+        <p>Two constants are defined at the beginning of the simulation. The first is the radius at which an individual is affected by flockmates. Intuitively, this reflects the fact that an individual has limited information about the flock and will not be influnced by individuals that are far away. We call this the attracton radius. The second constant is the radius at which an individual will be repelled by others. This prevents collisions that might result from other rules of the algorithm. We call this the repulsion radius. Both of these constants can be adjusted to refine the movement patterns of the simulation but, but the repulsion radius must be smaller than the attraction radius.</p>
+        <p>For each individual X in the flock, we collect the set Y of all individuals within the attraction and the set Z of all individuals within the repulsion radius. We define three rules to calculate the velocity of an indivdual. The first is the alignment rule, which says that the velocity of X should point towards the average direction of </p>
+
       </div>
     </div>
   </div>

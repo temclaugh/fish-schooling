@@ -20,11 +20,16 @@ function distance(a, b) {
 }
 
 function initTree(boids) {
-  boids = boids.map(function (x) {
-    x.x = x.position.x;
-    x.y = x.position.y;
-    x.z = x.position.z;
-    return x;
+  boids = boids.map(function (boid) {
+
+    var boid_pos = new THREE.Vector3(boid.position.x, boid.position.y, boid.position.z);
+    boid.localToWorld(boid_pos);
+
+    boid.x = boid_pos.x;
+    boid.y = boid_pos.y;
+    boid.z = boid_pos.z;
+    return boid;
+
   });
   return new kdTree(boids, distance, ["x", "y", "z"]);
 }
@@ -58,6 +63,8 @@ function getSeparation(boid, neighbors, mul) {
     if (neighbor == boid) {
       continue;
     }
+
+    // TODO: Restrict this to neighbors within small radius!
 
     var neighbor_pos = new THREE.Vector3(neighbor.position.x, neighbor.position.y, neighbor.position.z);
     neighbor.localToWorld(neighbor_pos);

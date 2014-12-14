@@ -4,6 +4,7 @@ var loader = new THREE.ColladaLoader();
 var boids = [];
 var boidsLoaded = false;
 var skyLoaded = false;
+var vecLenMax = .2;
 
 function draw3D()  {
   var controls;
@@ -13,7 +14,21 @@ function draw3D()  {
     if (!skyLoaded || !boidsLoaded) return;
 
     for (var i = boids.length - 1; i >= 0; i--) {
-        boids[i].translateY(-.1);
+        if (vectorLength(boids[i].vel) > vecLenMax && vectorLength(boids[i].vel) > .001) {
+            var v = normalize(boids[i].vel);
+            boids[i].vel = new THREE.Vector3(vecLenMax*v.x, vecLenMax*v.y, vecLenMax*v.z);
+        }
+
+        var boid_pos = new THREE.Vector3(boids[i].position.x, boids[i].position.y, boids[i].position.z);
+        boids[i].localToWorld(boid_pos);
+
+
+        //boids[i].lookAt(new THREE.Vector3(boid_pos.x + boids[i].vel.x * -1, boid_pos.y + boids[i].vel.y, boid_pos.z + boids[i].vel.z           ));
+        //boids[i].rotation.x = -Math.PI/2;
+        boids[i].position.x += boids[i].vel.x;
+        boids[i].position.y += boids[i].vel.y;
+        boids[i].position.z += boids[i].vel.z;
+        p("X: " + boids[i].vel.x + " Y: " + boids[i].vel.y + " Z: " + boids[i].vel.z);
     };
 
     renderer.render(scene, camera);
@@ -59,7 +74,7 @@ function draw3D()  {
   var boidbox = new THREE.Object3D();
 
   for(var i = 0; i < numBoids; i++) {
-    loader.load('low-poly-plane.dae', function(result) {
+    loader.load('flying_boid.dae', function(result) {
       var idx = boids.length;
       boids[idx] = result.scene;
       boids[idx].rotation.x = -Math.PI/2;
@@ -71,6 +86,7 @@ function draw3D()  {
       boids[idx].x = boids[idx].position.x;
       boids[idx].y = boids[idx].position.y;
       boids[idx].z = boids[idx].position.z;
+      boids[idx].vel = new THREE.Vector3(0.1*Math.random()-.05,0.1*Math.random()-.05,0.1*Math.random()-.05);
       boidbox.add(boids[idx]);
       if (boids.length == numBoids - 1) {
         boidsLoaded = true;

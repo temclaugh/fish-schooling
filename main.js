@@ -20,7 +20,7 @@ function draw3D()  {
   var controls;
 
   function animate() {
-    scene.updateMatrixWorld();
+    //scene.updateMatrixWorld();
     requestAnimationFrame(animate);
     if (!skyLoaded || !boidsLoaded) return;
 
@@ -96,14 +96,6 @@ function draw3D()  {
   }
 
   clock = new THREE.Clock();
-
-  geo = new THREE.SphereGeometry(1, 25, 25);
-  var sphere = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({color: 0x00ff00}));
-  sphere.position.set(2.5, -1, 0);
-
-  geo = new THREE.BoxGeometry(2,2,2);
-  var cube = new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color: 0x0000ff })   );
-  cube.position.set(0, 1, 0);
 
   var camera = new THREE.PerspectiveCamera(  45, 1024/500,0.1, 100000);
   camera.position.z = 10;

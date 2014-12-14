@@ -102,14 +102,15 @@ function nextGeneration(boids) {
       continue;
     }
 
+    var alignment = {x: 0, y: 0, z: 0};
     var alignment = getAlignment(boid, neighbors);
-
     newBoids.push({
-      x: alignment.x,
-      y: alignment.y,
-      z: alignment.z,
+      x: boid.position.x + alignment.x,
+      y: boid.position.y + alignment.y,
+      z: boid.position.z + alignment.z,
     });
-  }
+    newBoids[newBoids.length - 1]  = normalize(newBoids[newBoids.length - 1]);
+  };
 
   for (i in newBoids) {
     boids[i].rotation.x = newBoids[i].x;

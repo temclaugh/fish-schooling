@@ -34,11 +34,11 @@ function initTree(boids) {
   return new kdTree(boids, distance, ["x", "y", "z"]);
 }
 
-function getAlignment(boid, neighbors) {
+function getAlignment(boid, neighbors, limit) {
   var alignment = {x: 0, y: 0, z: 0};
   for (i in neighbors) {
     neighbor = neighbors[i][0];
-    if (neighbor == boid) {
+    if (neighbor == boid || distance(neighbor, boid) > limit) {
       continue;
     }
     alignment = {
@@ -53,31 +53,8 @@ function getAlignment(boid, neighbors) {
 }
 
 function getSeparation(boid, neighbors, mul) {
-  var separation = {x: 0, y: 0, z: 0};
-
-  var boid_pos = new THREE.Vector3(boid.position.x, boid.position.y, boid.position.z);
-  boid.localToWorld(boid_pos);
-
-  for (j in neighbors) {
-    neighbor = neighbors[j][0];
-    if (neighbor == boid) {
-      continue;
-    }
-
-    // TODO: Restrict this to neighbors within small radius!
-
-    var neighbor_pos = new THREE.Vector3(neighbor.position.x, neighbor.position.y, neighbor.position.z);
-    neighbor.localToWorld(neighbor_pos);
-
-    separation = {
-      x: separation.x + neighbor_pos.x,
-      y: separation.y + neighbor_pos.y,
-      z: separation.z + neighbor_pos.z,
-    };
-  }
-  var n = neighbors.length - 1;
-  separation = {x: (boid_pos.x - (separation.x / n)) * mul, y: (boid_pos.y - (separation.y / n)) * mul , z: (boid_pos.z - (separation.z / n)) * mul, };
-  return separation;
+  var separation = getAlignment(boid, neighbors, repulsionRadius);
+  return {x: -1 * mul * separation.x, y: -1 * mul * separation.y, z: -1 * mul * separation.z};
 }
 
 function getCohesion(boid, neighbors, mul) {
@@ -131,9 +108,10 @@ function nextGeneration(boids) {
     }
 
     // var alignment = boid.rotation;
-    var alignment = getAlignment(boid, neighbors);
-    var cohesion = getCohesion(boid, neighbors, .05);
-    var separation = getSeparation(boid, neighbors, .05);
+    var alignment = getAlignment(boid, neighbors, attractionRadius);
+    var cohesion = getCohesion(boid, neighbors, 1);
+    var separation = getSeparation(boid, neighbors, .01);
+
     newBoids.push({
       x: (boid.rotation.x + cohesion.x + alignment.x)/3,
       y: (boid.rotation.y + cohesion.y + alignment.y)/3,

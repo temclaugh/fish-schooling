@@ -29,11 +29,6 @@ function draw3D()  {
             var v = normalize(boids[i].vel);
             boids[i].vel = new THREE.Vector3(vecLenMax*v.x, vecLenMax*v.y, vecLenMax*v.z);
         }
-        else if (vectorLength(boids[i].vel) < .001) {
-            var v = boids[i].vel;
-            boids[i].vel = new THREE.Vector3(1000*v.x, 1000*v.y, 1000*v.z);
-            p("vectors were small...");
-        }
 
         boids[i].velqueue.push(boids[i].vel);
         if (boids[i].velqueue.length > queueBound) {
@@ -45,19 +40,6 @@ function draw3D()  {
 
         var boid_pos = new THREE.Vector3(boids[i].position.x, boids[i].position.y, boids[i].position.z);
 
-        // boids[i].position.x += boids[i].vel.x;
-        // boids[i].position.y += boids[i].vel.y;
-        // boids[i].position.z += boids[i].vel.z;
-
-        if (boids[i].velqueue.length < queueBound) {
-          var look_at = new THREE.Vector3(boid_pos.x + boids[i].vel.x * 2, boid_pos.y + boids[i].vel.y * 2, boid_pos.z + boids[i].vel.z * 2);
-
-          boids[i].position.x += 2*boids[i].vel.x;
-          boids[i].position.y += 2*boids[i].vel.y;
-          boids[i].position.z += 2*boids[i].vel.z;
-
-        }
-        else {
             var xcoord = 0;
             var ycoord = 0;
             var zcoord = 0;
@@ -74,10 +56,9 @@ function draw3D()  {
             boid_pos.z + zcoord
             )
 
-          boids[i].position.x += ycoord/(queueBound/5);
-          boids[i].position.y += ycoord/(queueBound/5);
-          boids[i].position.z += ycoord/(queueBound/5);
-        }
+          boids[i].position.x += xcoord/(boids[i].velqueue.length/5);
+          boids[i].position.y += ycoord/(boids[i].velqueue.length/5);
+          boids[i].position.z += zcoord/(boids[i].velqueue.length/5);
 
         console.log( "vel: " + boids[i].vel.x + " " + boids[i].vel.y + " " + boids[i].vel.z + "   ");
 
@@ -86,18 +67,24 @@ function draw3D()  {
         boids[i].rotateX( -Math.PI/2 );
 
 
-        if (boids[i].position.x > xMax)
+        if (boids[i].position.x > xMax) {
           boids[i].vel.x -= wallOffset;
-        if (boids[i].position.x < xMin)
+        }
+        if (boids[i].position.x < xMin) {
           boids[i].vel.x += wallOffset;
-        if (boids[i].position.y > yMax)
+        }
+        if (boids[i].position.y > yMax) {
           boids[i].vel.y -= wallOffset;
-        if (boids[i].position.y < yMin)
+        }
+        if (boids[i].position.y < yMin) {
           boids[i].vel.y += wallOffset;
-        if (boids[i].position.z > zMax)
+        }
+        if (boids[i].position.z > zMax) {
           boids[i].vel.z -= wallOffset;
-        if (boids[i].position.z < zMin)
+        }
+        if (boids[i].position.z < zMin) {
           boids[i].vel.z += wallOffset;
+        }
     };
 
     renderer.render(scene, camera);

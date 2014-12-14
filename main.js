@@ -23,8 +23,7 @@ function draw3D()  {
         boids[i].localToWorld(boid_pos);
 
 
-        //boids[i].lookAt(new THREE.Vector3(boid_pos.x + boids[i].vel.x * -1, boid_pos.y + boids[i].vel.y, boid_pos.z + boids[i].vel.z           ));
-        //boids[i].rotation.x = -Math.PI/2;
+        boids[i].lookAt(new THREE.Vector3(boid_pos.x + boids[i].vel.x, boid_pos.y + boids[i].vel.y, boid_pos.z + boids[i].vel.z));
         boids[i].position.x += boids[i].vel.x;
         boids[i].position.y += boids[i].vel.y;
         boids[i].position.z += boids[i].vel.z;
@@ -78,11 +77,11 @@ function draw3D()  {
       var idx = boids.length;
       boids[idx] = result.scene;
       boids[idx].rotation.x = -Math.PI/2;
-      boids[idx].rotation.y = (-Math.PI/2 * Math.random()) + Math.PI/4;
-      boids[idx].rotation.z = (-Math.PI/2 * Math.random()) + Math.PI/4;
-      boids[idx].position.x = ((Math.random() * 40.0) - 20);
-      boids[idx].position.y = ((Math.random() * 40.0) - 20);
-      boids[idx].position.z = ((Math.random() * 40.0) - 20);
+      //boids[idx].rotation.y = (-Math.PI/2 * Math.random()) + Math.PI/4;
+      //boids[idx].rotation.z = (-Math.PI/2 * Math.random()) + Math.PI/4;
+      boids[idx].position.x = ((Math.random() * 80.0) - 40);
+      boids[idx].position.y = ((Math.random() * 80.0) - 40);
+      boids[idx].position.z = ((Math.random() * 80.0) - 40);
       boids[idx].x = boids[idx].position.x;
       boids[idx].y = boids[idx].position.y;
       boids[idx].z = boids[idx].position.z;

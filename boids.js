@@ -1,5 +1,5 @@
 var numBoids = 20;
-var attractionRadius = 30.0;
+var attractionRadius = 1000.0;
 var repulsionRadius = 15;
 
 var p = function (x) { console.log(x); };
@@ -133,21 +133,21 @@ function nextGeneration(boids) {
       continue;
     }
 
-    // var alignment = boid.rotation;
+    var alignment_angle = getAlignment(boid, neighbors, attractionRadius);
     var alignment = getAlignment2(boid, neighbors, .12);
     var cohesion = getCohesion(boid, neighbors, .3);
 
     var close_neighbors = boidTree.nearest(boid, numBoids, repulsionRadius);
     var separation = getSeparation(boid, close_neighbors, .3);
 
-    var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x + separation.vel.x,
-                             boid.vel.y + cohesion.vel.y + separation.vel.y,
-                             boid.vel.z + cohesion.vel.z + separation.vel.z);
+    var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x + separation.vel.x + alignment.x,
+                                     boid.vel.y + cohesion.vel.y + separation.vel.y + alignment.y,
+                                     boid.vel.z + cohesion.vel.z + separation.vel.z + alignment.z);
 
     newBoids.push({
-      x: (boid.rotation.x + alignment.x)/2,
-      y: (boid.rotation.y + alignment.y)/2,
-      z: (boid.rotation.z + alignment.z)/2,
+      x: alignment_angle.x,
+      y: alignment_angle.y,
+      z: alignment_angle.z,
       vel: velocity
     });
   };

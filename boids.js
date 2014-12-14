@@ -1,6 +1,6 @@
 var numBoids = 20;
-var attractionRadius = 1000;
-var repulsionRadius = 10;
+var cohesionRadius = 40;
+var separationRadius = 10;
 
 var p = function (x) { console.log(x); };
 
@@ -56,22 +56,30 @@ function getAlignment(boid, neighbors, mul) {
 
 function getSeparation(boid, neighbors, mul) {
   var separation = {x: 0, y: 0, z: 0};
-  var n = neighbors.length - 1;
-  for (j in neighbors) {
+  var n = neighbors.length;
+
+  for (j in neighbors)
+  {
     neighbor = neighbors[j][0];
-    if (boidEquals(neighbor, boid)) {
+
+    if (boidEquals(neighbor, boid))
+    {
       n--;
       continue;
     }
-    separation = {
-      x: separation.x - (boid.position.x - neighbor.position.x),
-      y: separation.y - (boid.position.y - neighbor.position.y),
-      z: separation.z - (boid.position.z - neighbor.position.z),
+
+    separation =
+    {
+      x: separation.x + (boid.position.x - neighbor.position.x),
+      y: separation.y + (boid.position.y - neighbor.position.y),
+      z: separation.z + (boid.position.z - neighbor.position.z),
     };
   }
 
-  if (n > 0) {
-    separation = {
+  if (n > 0)
+  {
+    separation =
+    {
       x: ((separation.x) / n) * mul,
       y: ((separation.y) / n) * mul,
       z: ((separation.z) / n) * mul,
@@ -88,7 +96,7 @@ function getSeparation(boid, neighbors, mul) {
 
 function getCohesion(boid, neighbors, mul) {
   var cohesion = {x: 0, y: 0, z: 0};
-  var n = neighbors.length - 1;
+  var n = neighbors.length;
 
   for (j in neighbors) {
     neighbor = neighbors[j][0];
@@ -125,29 +133,44 @@ function nextGeneration(boids) {
   for (i in boids) {
 
     var boid = boids[i];
-    var neighbors = boidTree.nearest(boid, numBoids, attractionRadius);
+    var neighbors = boidTree.nearest(boid, numBoids, cohesionRadius);
 
-    if (neighbors.length == 1) {
-      newBoids.push({
-        x: boid.rotation.x,
-        y: boid.rotation.y,
-        z: boid.rotation.z,
-        vel: boid.vel
-      });
-      continue;
-    }
+//    if (neighbors.length == 1) {
+//      newBoids.push({
+//        //x: boid.rotation.x,
+//        //y: boid.rotation.y,
+//        //z: boid.rotation.z,
+//        vel: boid.vel
+//      });
+//      continue;
+//    }
 
-    var alignment = getAlignment(boid, neighbors, .12);
-    var cohesion = getCohesion(boid, neighbors, .01);
-    p("Cx: " + cohesion.vel.x + " Cy: " + cohesion.vel.y + " Cz: " + cohesion.vel.z);
+    var alignment = getAlignment(boid, neighbors, .005);
+    var cohesion = getCohesion(boid, neighbors, 0.005);
+    //p("Cx: " + cohesion.vel.x + " Cy: " + cohesion.vel.y + " Cz: " + cohesion.vel.z);
 
-    var close_neighbors = boidTree.nearest(boid, numBoids, repulsionRadius);
+    var close_neighbors = boidTree.nearest(boid, numBoids, separationRadius);
     var separation = getSeparation(boid, close_neighbors, 1);
+    //p("Sx: " + separation.vel.x + " Sy: " + separation.vel.y + " Sz: " + separation.vel.z);
+
     //p("Ax: " + alignment.x + " Ay: " + alignment.y + " Az: " + alignment.z);
 
-    var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x - separation.vel.x + alignment.x,
-                                     boid.vel.y + cohesion.vel.y - separation.vel.y + alignment.y,
-                                     boid.vel.z + cohesion.vel.z - separation.vel.z + alignment.z);
+    var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x + separation.vel.x + alignment.x,
+                                    boid.vel.y + cohesion.vel.y + separation.vel.y + alignment.y,
+                                    boid.vel.z + cohesion.vel.z + separation.vel.z + alignment.z);
+
+    //var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x + separation.vel.x,
+    //                                 boid.vel.y + cohesion.vel.y + separation.vel.y,
+    //                                 boid.vel.z + cohesion.vel.z + separation.vel.z);
+
+
+    //var velocity = new THREE.Vector3(boid.vel.x * 0.95 + separation.vel.x,
+    //                                 boid.vel.y * 0.95 + separation.vel.y,
+    //                                 boid.vel.z * 0.95 + separation.vel.z);
+
+    // var velocity = new THREE.Vector3(cohesion.vel.x + separation.vel.x,
+    //                                  cohesion.vel.y + separation.vel.y,
+    //                                  cohesion.vel.z + separation.vel.z);
 
     newBoids.push({
       x: 0,

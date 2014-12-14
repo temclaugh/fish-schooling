@@ -1,49 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
   <title>3D Boids</title>
   <meta name="description" content="">
   <meta name="author" content="">
-
-  <!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-  <!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
-
-  <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
-
-  <!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <!-- <link rel="icon" type="image/png" href="images/favicon.png" /> -->
-
 </head>
 <body>
-
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="container">
     <div class="row">
       <div class="one-half column" style="margin-top: 10%">
-        <h4>3D Boids</h4>
-        <p>The boids algorithm describes the movement patterns exhibited by groups of animals with just a few simple rules. Groups such as schools of fish and flocks of birds have clusters of individuals whose velocity at a given moment is determined by the velocities of the indivudals surrounding them. This algorithm was invented by Craig Reynolds in 1986.</p>
-        <p>Two constants are defined at the beginning of the simulation. The first is the radius at which an individual is affected by flockmates. Intuitively, this reflects the fact that an individual has limited information about the flock and will not be influnced by individuals that are far away. We call this the attracton radius. The second constant is the radius at which an individual will be repelled by others. This prevents collisions that might result from other rules of the algorithm. We call this the repulsion radius. Both of these constants can be adjusted to refine the movement patterns of the simulation but, but the repulsion radius must be smaller than the attraction radius.</p>
-        <p>For each individual X in the flock, we collect the set Y of all individuals within the attraction and the set Z of all individuals within the repulsion radius. We define three rules to calculate the velocity of an indivdual. The first is the alignment rule, which says that the velocity of X should point towards the average direction of </p>
+        <h2>3D Boids</h2>
+        <h5>Jo Booth and Tim McLaughlin</h5>
+        <p>The boids algorithm describes the movement patterns exhibited by groups of animals with just a few simple rules. Groups such as schools of fish and flocks of birds have clusters of individuals (known as 'boids') whose velocity at a given moment is determined by the velocities of the boids surrounding them. This algorithm was invented by Craig Reynolds in 1986.</p>
+        <h5>Constants</h5>
+        <p>Two constants are defined at the beginning of the simulation. The first is the radius at which a boid is affected by flockmates. Intuitively, this reflects the fact that a boid has limited information about the flock and will not be influenced by boids that are far away. We call this the attraction radius. The second constant is the radius at which a boid will be repelled by others. This prevents collisions that might result from other rules of the algorithm. We call this the repulsion radius. Both of these constants can be adjusted to refine the movement patterns of the simulation, but the repulsion radius must be smaller than the attraction radius.</a>
+        <h5>Steering Rules</h5>
+        <p>For each boid <i>x</i> in the flock, we collect the set Y of all boids within the attraction radius and the set Z of all boids within the repulsion radius. We define three rules to calculate the velocity of a boid. The first rule is the alignment rule, which states that the velocity of <i>x</i> should point towards the average direction of boids in Y. This causes the flock to steer in roughly the same direction. The second rule is the cohesion rule, which states that the velocity of <i>x</i> should point towards the average location of boids in Y. The causes the flock to group together. The third and final rule is the separation rule, which states that the velocity of <i>x</i> should point away from the average location of boids in Z. As stated earlier, this prevents the boid from colliding and effectively forming a black hole.</p>
+        <p>As a result of these rules, an initially random placement of boids will form clusters that behave as intended, and these clusters have the potential to merge into bigger clusters or collide and cause smaller clusters break off.</p>
+        <h5>Implementation</h5>
+        <p>In our implementation of this algorithm, we applied these rules to a three dimensional simulation of birds in WebGL. We chose this framework due to its portability and promising future as a mainstream web-based rendering engine.</p>
+        <p>To represent the positions of the boids in world space, a simple list would have required O(n<sup>2</sup>) time to calculate the next generation due to the cost of querying the nearest neighbors. Instead, we used a k-d tree to increase performance. A k-d tree is a data structure that, given any k-dimensional distance function, can find the nearest neighbor in an expected O(log n) time, depending on the distribution of the positions of the boids in space. This makes calculating the next generation roughly O(n log n). We used <a href="https://github.com/ubilabs/kd-tree-javascript">this</a> implementation of a k-d tree in JavaScript. The only operations we required were (1) constructing a tree given a list of points, and (2) finding all of the nearest neighbors of a point within a given distance (the two radii define earlier).</p>
+        <p>We used a library called three.js as an interface to WebGL. The main difficulty we had was consolidating movement vectors with rotations and positions. Our algorithm used velocity vectors to describe the movement of boids with an implied upward orientation of the boids, but three.js only uses position and rotations and doesn't have a standard way of dealing with directional movement.</p>
 
       </div>
     </div>
   </div>
-
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 </body>
 </html>

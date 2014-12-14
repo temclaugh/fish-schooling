@@ -4,8 +4,8 @@ var loader = new THREE.ColladaLoader();
 var boids = [];
 var boidsLoaded = false;
 var skyLoaded = false;
-var vecLenMax = .2;
-
+var vecLenMax = .1;
+var wallOffset = .01;
 var yMin = -78;
 var yMax = 92;
 
@@ -23,39 +23,37 @@ function draw3D()  {
     if (!skyLoaded || !boidsLoaded) return;
 
     for (var i = boids.length - 1; i >= 0; i--) {
-        if (vectorLength(boids[i].vel) > vecLenMax && vectorLength(boids[i].vel) > .001) {
+        if (vectorLength(boids[i].vel) > vecLenMax) {
             var v = normalize(boids[i].vel);
             boids[i].vel = new THREE.Vector3(vecLenMax*v.x, vecLenMax*v.y, vecLenMax*v.z);
         }
+        // else if (vectorLength(boids[i].vel) <= .001) {
+        //     boids[i].vel = new THREE.Vector3(Math.random() * .01 - .005,Math.random() * .01 - .005,Math.random() * .01 - .005);
+        // }
 
         var boid_pos = new THREE.Vector3(boids[i].position.x, boids[i].position.y, boids[i].position.z);
-        boids[i].localToWorld(boid_pos);
-
 
         boids[i].lookAt(new THREE.Vector3(boid_pos.x + boids[i].vel.x, boid_pos.y + boids[i].vel.y, boid_pos.z + boids[i].vel.z));
+        boids[i].rotation.x -= Math.PI/2;
         boids[i].position.x += boids[i].vel.x;
         boids[i].position.y += boids[i].vel.y;
         boids[i].position.z += boids[i].vel.z;
 
-        if (boids[i].position.x > xMax || boids[i].position.x < xMin) {
-          boids[i].vel.x *= -1;
-        }
-        if (boids[i].position.y > yMax || boids[i].position.y < yMin) {
-          boids[i].vel.y *= -1;
-        }
-        if (boids[i].position.z > zMax || boids[i].position.z < zMin) {
-          boids[i].vel.z *= -1;
-        }
+        if (boids[i].position.x > xMax)
+          boids[i].vel.x -= wallOffset;
+        if (boids[i].position.x < xMin)
+          boids[i].vel.x += wallOffset;
+        if (boids[i].position.y > yMax)
+          boids[i].vel.y -= wallOffset;
+        if (boids[i].position.y < yMin)
+          boids[i].vel.y += wallOffset;
+        if (boids[i].position.z > zMax)
+          boids[i].vel.z -= wallOffset;
+        if (boids[i].position.z < zMin)
+          boids[i].vel.z += wallOffset;
     };
 
     renderer.render(scene, camera);
-    //camera.rotateY(Math.PI/1720);
-    //camera.translateX(Math.PI/180);
-
-    // if (controls.moveForward) {
-    //   console.log("moving forward");
-    //   camera.translateZ(-Math.PI/180);
-    // }
 
     controls.update(clock.getDelta());
     nextGeneration(boids);
@@ -94,9 +92,6 @@ function draw3D()  {
     loader.load('flying_boid.dae', function(result) {
       var idx = boids.length;
       boids[idx] = result.scene;
-      boids[idx].rotation.x = -Math.PI/2;
-      //boids[idx].rotation.y = (-Math.PI/2 * Math.random()) + Math.PI/4;
-      //boids[idx].rotation.z = (-Math.PI/2 * Math.random()) + Math.PI/4;
       boids[idx].position.x = ((Math.random() * 80.0) - 40);
       boids[idx].position.y = ((Math.random() * 80.0) - 40);
       boids[idx].position.z = ((Math.random() * 80.0) - 40);

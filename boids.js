@@ -1,6 +1,6 @@
 var numBoids = 20;
-var attractionRadius = 1000.0;
-var repulsionRadius = 15;
+var attractionRadius = 1000;
+var repulsionRadius = 10;
 
 var p = function (x) { console.log(x); };
 
@@ -25,43 +25,20 @@ function distance(a, b) {
 
 function initTree(boids) {
   boids = boids.map(function (boid) {
-
-    var boid_pos = new THREE.Vector3(boid.position.x, boid.position.y, boid.position.z);
-    boid.localToWorld(boid_pos);
-
-    boid.x = boid_pos.x;
-    boid.y = boid_pos.y;
-    boid.z = boid_pos.z;
+    boid.x = boid.position.x;
+    boid.y = boid.position.y;
+    boid.z = boid.position.z;
     return boid;
-
   });
   return new kdTree(boids, distance, ["x", "y", "z"]);
 }
 
-function getAlignment(boid, neighbors, limit) {
-  var alignment = {x: 0, y: 0, z: 0};
-  for (i in neighbors) {
-    neighbor = neighbors[i][0];
-    if (boidEquals(neighbor, boid) || distance(neighbor, boid) > limit) {
-      continue;
-    }
-    alignment = {
-      x: alignment.x + neighbor.rotation.x,
-      y: alignment.y + neighbor.rotation.y,
-      z: alignment.z + neighbor.rotation.z,
-    };
-  }
-  var n = neighbors.length - 1;
-  alignment = {x: alignment.x / n, y: alignment.y / n, z: alignment.z / n, };
-  return alignment;
-}
-
-function getAlignment2(boid, neighbors, mul) {
+function getAlignment(boid, neighbors, mul) {
   var alignment = {x: 0, y: 0, z: 0};
   var n = neighbors.length - 1;
   for (i in neighbors) {
     neighbor = neighbors[i][0];
-    if (boidEquals(neighbor, boid) || distance(neighbor, boid) > repulsionRadius) {
+    if (boidEquals(neighbor, boid)) {
       --n;
       continue;
     }
@@ -78,15 +55,45 @@ function getAlignment2(boid, neighbors, mul) {
 }
 
 function getSeparation(boid, neighbors, mul) {
-  return getCohesion(boid, neighbors, -1*mul);
+  var separation = {x: 0, y: 0, z: 0};
+  var n = neighbors.length - 1;
+  for (j in neighbors) {
+    neighbor = neighbors[j][0];
+    if (boidEquals(neighbor, boid)) {
+      n--;
+      continue;
+    }
+    separation = {
+      x: separation.x - (boid.position.x - neighbor.position.x),
+      y: separation.y - (boid.position.y - neighbor.position.y),
+      z: separation.z - (boid.position.z - neighbor.position.z),
+    };
+  }
+
+  if (n > 0) {
+    separation = {
+      x: ((separation.x) / n) * mul,
+      y: ((separation.y) / n) * mul,
+      z: ((separation.z) / n) * mul,
+    };
+  }
+
+  return {
+    x: 0,
+    y: 0,
+    z: 0,
+    vel: separation
+  };
 }
 
 function getCohesion(boid, neighbors, mul) {
   var cohesion = {x: 0, y: 0, z: 0};
+  var n = neighbors.length - 1;
 
   for (j in neighbors) {
     neighbor = neighbors[j][0];
     if (boidEquals(neighbor, boid)) {
+      n--;
       continue;
     }
     cohesion = {
@@ -95,22 +102,19 @@ function getCohesion(boid, neighbors, mul) {
       z: cohesion.z + neighbor.position.z,
     };
   }
-  var n = neighbors.length - 1;
-  cohesion = {
-    x: ((cohesion.x) / n - boid.position.x) * mul,
-    y: ((cohesion.y) / n - boid.position.y) * mul,
-    z: ((cohesion.z) / n - boid.position.z) * mul,
-  };
 
-  var dummyBoid = new THREE.Object3D();
-  dummyBoid.position.x = boid.position.x;
-  dummyBoid.position.y = boid.position.y;
-  dummyBoid.position.z = boid.position.z;
-  dummyBoid.lookAt(new THREE.Vector3(cohesion.x, cohesion.y, cohesion.z), boid.up);
+  if (n > 0) {
+    cohesion = {
+      x: ((cohesion.x) / n - boid.position.x) * mul,
+      y: ((cohesion.y) / n - boid.position.y) * mul,
+      z: ((cohesion.z) / n - boid.position.z) * mul,
+    };
+  }
+
   return {
-    x: dummyBoid.rotation.x,
-    y: dummyBoid.rotation.y,
-    z: dummyBoid.rotation.z,
+    x: 0,
+    y: 0,
+    z: 0,
     vel: cohesion
   }
 }
@@ -133,29 +137,30 @@ function nextGeneration(boids) {
       continue;
     }
 
-    var alignment_angle = getAlignment(boid, neighbors, attractionRadius);
-    var alignment = getAlignment2(boid, neighbors, .12);
-    var cohesion = getCohesion(boid, neighbors, .3);
+    var alignment = getAlignment(boid, neighbors, .12);
+    var cohesion = getCohesion(boid, neighbors, .01);
+    p("Cx: " + cohesion.vel.x + " Cy: " + cohesion.vel.y + " Cz: " + cohesion.vel.z);
 
     var close_neighbors = boidTree.nearest(boid, numBoids, repulsionRadius);
-    var separation = getSeparation(boid, close_neighbors, .3);
+    var separation = getSeparation(boid, close_neighbors, 1);
+    //p("Ax: " + alignment.x + " Ay: " + alignment.y + " Az: " + alignment.z);
 
-    var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x + separation.vel.x + alignment.x,
-                                     boid.vel.y + cohesion.vel.y + separation.vel.y + alignment.y,
-                                     boid.vel.z + cohesion.vel.z + separation.vel.z + alignment.z);
+    var velocity = new THREE.Vector3(boid.vel.x + cohesion.vel.x - separation.vel.x + alignment.x,
+                                     boid.vel.y + cohesion.vel.y - separation.vel.y + alignment.y,
+                                     boid.vel.z + cohesion.vel.z - separation.vel.z + alignment.z);
 
     newBoids.push({
-      x: alignment_angle.x,
-      y: alignment_angle.y,
-      z: alignment_angle.z,
+      x: 0,
+      y: 0,
+      z: 0,
       vel: velocity
     });
   };
 
   for (i in newBoids) {
-    boids[i].rotation.x = newBoids[i].x;
-    boids[i].rotation.y = newBoids[i].y;
-    boids[i].rotation.z = newBoids[i].z;
+    //boids[i].rotation.x = newBoids[i].x;
+    //boids[i].rotation.y = newBoids[i].y;
+    //boids[i].rotation.z = newBoids[i].z;
     boids[i].vel = newBoids[i].vel;
   }
 }

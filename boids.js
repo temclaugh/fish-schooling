@@ -47,6 +47,9 @@ function nextGeneration(boids) {
   var boidTree = initTree(boids);
   for (i in boids) {
     var boid = boids[i];
+
+    var boid_pos = boid.localToWorld(boid.position);
+
     var newBoids = [];
     var neighbors = boidTree.nearest(boid, numBoids, attractionRadius);
     if (neighbors.length == 1) {
@@ -68,18 +71,20 @@ function nextGeneration(boids) {
         continue;
       }
 
-      cohesion.x += neighbor.position.x;
-      cohesion.y += neighbor.position.y;
-      cohesion.z += neighbor.position.z;
+      var neighbor_pos = neighbor.localToWorld(neighbor.position);
+
+      cohesion.x += neighbor_pos.x;
+      cohesion.y += neighbor_pos.y;
+      cohesion.z += neighbor_pos.z;
 
       alignment.x += neighbor.rotation.x;
       alignment.y += neighbor.rotation.y;
       alignment.z += neighbor.rotation.z;
 
       if (distance(boid, neighbor) < repulsionRadius) {
-        separation.x += neighbor.position.x - boid.position.x;
-        separation.y += neighbor.position.y - boid.position.y;
-        separation.z += neighbor.position.z - boid.position.z;
+        separation.x += neighbor_pos.x - boid_pos.x;
+        separation.y += neighbor_pos.y - boid_pos.y;
+        separation.z += neighbor_pos.z - boid_pos.z;
       }
     }
 
@@ -96,6 +101,9 @@ function nextGeneration(boids) {
       y: alignment.y/n,
       z: alignment.z/n,
     };
+
+
+
     separation = {
       x: separation.x/n - boid.position.x,
       y: separation.y/n - boid.position.y,
@@ -110,16 +118,16 @@ function nextGeneration(boids) {
     //   y: (cohesion.y + alignment.y + separation.y)/3,
     //   z: (cohesion.z + alignment.z + separation.z)/3,
     // }
-    newDirection = {
-      x: cohesion.x,
-      y: cohesion.y,
-      z: cohesion.z,
-    }
+
+    newDirection = new THREE.Vector3(cohesion.x, cohesion.y, cohesion.z);
+
+    //newDirection = boid.worldToLocal(newDirection);
+
     var oldRotation = {x: boid.rotation.x, y: boid.rotation.y, z: boid.rotation.z};
-    boid.lookAt(new THREE.Vector3(cohesion.x, cohesion.y, cohesion.z), boid.rotation.x);
+    boid.lookAt(newDirection, boid.rotation.x);
     var newRotation = {x: boid.rotation.x, y: boid.rotation.y, z: boid.rotation.z};
     // console.log(oldRotation, cohesion, newRotation);
-    console.log(boid.up);
+    // console.log(boid.up);
 
     newBoids.push({
       x: newDirection.x,
@@ -135,12 +143,11 @@ function nextGeneration(boids) {
   }
 }
 
-/*
-//var boids = constructBoids(numBoids);
-boids = boids.map(function (x) {
-  x.x = x.position.x;
-  x.y = x.position.y;
-  x.z = x.position.z;
-  return x;
-});
-*/
+
+var boids = constructBoids(numBoids);
+// boids = boids.map(function (x) {
+//   x.x = x.position.x;
+//   x.y = x.position.y;
+//   x.z = x.position.z;
+//   return x;
+// });

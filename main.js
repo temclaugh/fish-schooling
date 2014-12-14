@@ -135,7 +135,6 @@ function draw3D()  {
     var numBoids = 20;
   }
 
-
   for(var i = 0; i < numBoids; i++) {
     loader.load(loadMe, function(result) {
       var idx = boids.length;
@@ -149,7 +148,7 @@ function draw3D()  {
       boids[idx].vel = {x : 0.1*Math.random()-.05, y: 0.1*Math.random()-.05, z : 0.1*Math.random()-.05};
       boids[idx].velqueue = [];
       boidbox.add(boids[idx]);
-      if (boids.length == numBoids - 1) {
+      if (boids.length == numBoids) {
         boidsLoaded = true;
       }
     });

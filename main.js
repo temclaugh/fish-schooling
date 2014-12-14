@@ -63,11 +63,11 @@ function draw3D()  {
       var idx = boids.length;
       boids[idx] = result.scene;
       boids[idx].rotation.x = -Math.PI/2;
-      boids[idx].rotation.y = -Math.PI/2 * Math.random();
-      boids[idx].rotation.z = -Math.PI/2 * Math.random();
-      boids[idx].position.x = (Math.random() * 20.0);
-      boids[idx].position.y = (Math.random() * 20.0);
-      boids[idx].position.z = (Math.random() * 20.0);
+      boids[idx].rotation.y = (-Math.PI/2 * Math.random()) + Math.PI/4;
+      boids[idx].rotation.z = (-Math.PI/2 * Math.random()) + Math.PI/4;
+      boids[idx].position.x = ((Math.random() * 40.0) - 20);
+      boids[idx].position.y = ((Math.random() * 40.0) - 20);
+      boids[idx].position.z = ((Math.random() * 40.0) - 20);
       boids[idx].x = boids[idx].position.x;
       boids[idx].y = boids[idx].position.y;
       boids[idx].z = boids[idx].position.z;

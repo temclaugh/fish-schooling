@@ -132,12 +132,12 @@ function nextGeneration(boids) {
 
     // var alignment = boid.rotation;
     var alignment = getAlignment(boid, neighbors);
-    var cohesion = getCohesion(boid, neighbors, 1);
-    var separation = getSeparation(boid, neighbors, .01);
+    var cohesion = getCohesion(boid, neighbors, .05);
+    var separation = getSeparation(boid, neighbors, .05);
     newBoids.push({
-      x: (boid.rotation.x + cohesion.x + alignment.x)/2,
-      y: (boid.rotation.y + cohesion.y + alignment.y)/2,
-      z: (boid.rotation.z + cohesion.z + alignment.z)/2,
+      x: (boid.rotation.x + cohesion.x + alignment.x)/3,
+      y: (boid.rotation.y + cohesion.y + alignment.y)/3,
+      z: (boid.rotation.z + cohesion.z + alignment.z)/3,
     });
   };
 

@@ -25,67 +25,65 @@ function draw3D()  {
     if (!skyLoaded || !boidsLoaded) return;
 
     for (var i = boids.length - 1; i >= 0; i--) {
-        if (vectorLength(boids[i].vel) > vecLenMax) {
-            var v = normalize(boids[i].vel);
-            boids[i].vel = new THREE.Vector3(vecLenMax*v.x, vecLenMax*v.y, vecLenMax*v.z);
-        }
+      if (vectorLength(boids[i].vel) > vecLenMax) {
+        var v = normalize(boids[i].vel);
+        boids[i].vel = new THREE.Vector3(vecLenMax*v.x, vecLenMax*v.y, vecLenMax*v.z);
+      }
 
-        boids[i].velqueue.push(boids[i].vel);
-        if (boids[i].velqueue.length > queueBound) {
-          boids[i].velqueue.shift();
-        }
-        // else if (vectorLength(boids[i].vel) <= .001) {
-        //     boids[i].vel = new THREE.Vector3(Math.random() * .01 - .005,Math.random() * .01 - .005,Math.random() * .01 - .005);
-        // }
+      boids[i].velqueue.push(boids[i].vel);
+      if (boids[i].velqueue.length > queueBound) {
+        boids[i].velqueue.shift();
+      }
 
-        var boid_pos = new THREE.Vector3(boids[i].position.x, boids[i].position.y, boids[i].position.z);
+      var boid_pos = new THREE.Vector3(boids[i].position.x, boids[i].position.y, boids[i].position.z);
 
-            var xcoord = 0;
-            var ycoord = 0;
-            var zcoord = 0;
+      var xcoord = 0;
+      var ycoord = 0;
+      var zcoord = 0;
 
-            for (var j = boids[i].velqueue.length - 1; j >= 0; j--) {
-              xcoord += boids[i].velqueue[j].x;
-              ycoord += boids[i].velqueue[j].y;
-              zcoord += boids[i].velqueue[j].z;
-            };
+      for (var j = boids[i].velqueue.length - 1; j >= 0; j--) {
+        xcoord += boids[i].velqueue[j].x;
+        ycoord += boids[i].velqueue[j].y;
+        zcoord += boids[i].velqueue[j].z;
+      };
 
-          var look_at = new THREE.Vector3(
-            boid_pos.x + xcoord,
-            boid_pos.y + ycoord,
-            boid_pos.z + zcoord
-            )
+      var look_at = new THREE.Vector3(
+        boid_pos.x + xcoord,
+        boid_pos.y + ycoord,
+        boid_pos.z + zcoord
+      )
 
-          boids[i].position.x += xcoord/(boids[i].velqueue.length/5);
-          boids[i].position.y += ycoord/(boids[i].velqueue.length/5);
-          boids[i].position.z += zcoord/(boids[i].velqueue.length/5);
+      boids[i].position.x += xcoord/(boids[i].velqueue.length/5);
+      boids[i].position.y += ycoord/(boids[i].velqueue.length/5);
+      boids[i].position.z += zcoord/(boids[i].velqueue.length/5);
 
-        console.log( "vel: " + boids[i].vel.x + " " + boids[i].vel.y + " " + boids[i].vel.z + "   ");
+      //console.log( "vel: " + boids[i].vel.x + " " + boids[i].vel.y + " " + boids[i].vel.z + "   ");
 
-        boids[i].lookAt( look_at );
-        //boids[i].lookAt( new THREE.Vector3(0,0,0) );
-        boids[i].rotateX( -Math.PI/2 );
+      boids[i].lookAt( look_at );
+      //debugging: let's have the boids all look at the origin
+      //boids[i].lookAt( new THREE.Vector3(0,0,0) );
+      boids[i].rotateX( -Math.PI/2 );
 
 
-        if (boids[i].position.x > xMax) {
-          boids[i].vel.x -= wallOffset;
-        }
-        if (boids[i].position.x < xMin) {
-          boids[i].vel.x += wallOffset;
-        }
-        if (boids[i].position.y > yMax) {
-          boids[i].vel.y -= wallOffset;
-        }
-        if (boids[i].position.y < yMin) {
-          boids[i].vel.y += wallOffset;
-        }
-        if (boids[i].position.z > zMax) {
-          boids[i].vel.z -= wallOffset;
-        }
-        if (boids[i].position.z < zMin) {
-          boids[i].vel.z += wallOffset;
-        }
-    };
+      if (boids[i].position.x > xMax) {
+        boids[i].vel.x -= wallOffset;
+      }
+      if (boids[i].position.x < xMin) {
+        boids[i].vel.x += wallOffset;
+      }
+      if (boids[i].position.y > yMax) {
+        boids[i].vel.y -= wallOffset;
+      }
+      if (boids[i].position.y < yMin) {
+        boids[i].vel.y += wallOffset;
+      }
+      if (boids[i].position.z > zMax) {
+        boids[i].vel.z -= wallOffset;
+      }
+      if (boids[i].position.z < zMin) {
+        boids[i].vel.z += wallOffset;
+      }
+    }
 
     renderer.render(scene, camera);
 
@@ -100,7 +98,7 @@ function draw3D()  {
   clock = new THREE.Clock();
 
   // loader.load('www.jombooth.com/repo/models/flying_boid.dae');
-  // loader.load('www.jombooth.com/repo/models/low_poly_plane.dae');
+  // loader.load('www.jombooth.com/repo/models/low-poly-plane.dae');
   // loader.load('www.jombooth.com/repo/models/skyboxes.dae');
 
   geo = new THREE.SphereGeometry(1, 25, 25);
@@ -123,7 +121,7 @@ function draw3D()  {
   var boidbox = new THREE.Object3D();
 
   for(var i = 0; i < numBoids; i++) {
-    loader.load('low-poly-plane.dae', function(result) {
+    loader.load('flying_boid.dae', function(result) {
       var idx = boids.length;
       boids[idx] = result.scene;
       boids[idx].position.x = ((Math.random() * 5.0) - 2.5);
@@ -133,7 +131,6 @@ function draw3D()  {
       boids[idx].y = boids[idx].position.y;
       boids[idx].z = boids[idx].position.z;
       boids[idx].vel = {x : 0.1*Math.random()-.05, y: 0.1*Math.random()-.05, z : 0.1*Math.random()-.05};
-      //boids[idx].vel = {x : 0, y: 0, z : 0 };
       boids[idx].velqueue = [];
       boidbox.add(boids[idx]);
       if (boids.length == numBoids - 1) {

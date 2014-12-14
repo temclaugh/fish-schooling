@@ -109,8 +109,8 @@ function nextGeneration(boids) {
 
     // var alignment = boid.rotation;
     var alignment = getAlignment(boid, neighbors, attractionRadius);
-    var cohesion = getCohesion(boid, neighbors, 1);
-    var separation = getSeparation(boid, neighbors, .01);
+    var cohesion = getCohesion(boid, neighbors, .05);
+    var separation = getSeparation(boid, neighbors, .25);
 
     newBoids.push({
       x: (boid.rotation.x + cohesion.x + alignment.x)/3,

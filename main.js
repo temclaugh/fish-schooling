@@ -97,10 +97,6 @@ function draw3D()  {
 
   clock = new THREE.Clock();
 
-  // loader.load('www.jombooth.com/repo/models/flying_boid.dae');
-  // loader.load('www.jombooth.com/repo/models/low-poly-plane.dae');
-  // loader.load('www.jombooth.com/repo/models/skyboxes.dae');
-
   geo = new THREE.SphereGeometry(1, 25, 25);
   var sphere = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({color: 0x00ff00}));
   sphere.position.set(2.5, -1, 0);
@@ -116,17 +112,37 @@ function draw3D()  {
   controls = new THREE.FirstPersonControls( camera );
   controls.movementSpeed = 10;
   controls.lookSpeed = .05;
-  // controls.addEventListener( 'change', updateControls );
 
   var boidbox = new THREE.Object3D();
+  var urlInfo = document.URL.split("?")[1];
+  if(urlInfo) {
+    if (urlInfo.split("_")[0] == "planes") {
+    var loadMe = 'low-poly-plane.dae';
+    }
+    else {
+    var loadMe = 'flying_boid.dae';
+    }
+
+    if (parseInt(urlInfo.split("_")[1]) > 0) {
+    var numBoids = parseInt(urlInfo.split("_")[1])
+    }
+    else {
+    var numBoids = 20;
+    }
+  }
+  else {
+    var loadMe = 'flying_boid.dae';
+    var numBoids = 20;
+  }
+
 
   for(var i = 0; i < numBoids; i++) {
-    loader.load('flying_boid.dae', function(result) {
+    loader.load(loadMe, function(result) {
       var idx = boids.length;
       boids[idx] = result.scene;
-      boids[idx].position.x = ((Math.random() * 5.0) - 2.5);
-      boids[idx].position.y = ((Math.random() * 5.0) - 2.5);
-      boids[idx].position.z = ((Math.random() * 5.0) - 2.5);
+      boids[idx].position.x = ((Math.random() * 40) - 20);
+      boids[idx].position.y = ((Math.random() * 40) - 20);
+      boids[idx].position.z = ((Math.random() * 40) - 20);
       boids[idx].x = boids[idx].position.x;
       boids[idx].y = boids[idx].position.y;
       boids[idx].z = boids[idx].position.z;

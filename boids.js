@@ -1,6 +1,6 @@
-var numBoids = 50;
-var cohesionRadius = 40;
-var separationRadius = 10;
+var numBoids = 40;
+var cohesionRadius = 10;
+var separationRadius = 1.5;
 
 var p = function (x) { console.log(x); };
 

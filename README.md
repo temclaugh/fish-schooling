@@ -27,7 +27,7 @@ REQUIREMENTS:
 we met our project goals
 
 CODE DESIGN:
-we used a kd-tree to make fast 3d boids. for more details, see index.html.
+we used a kd-tree to make fast 3d boids. for more details, see index.html inside the tarball.
 
 RUNNING PROGRAM:
 This CANNOT work if the website is merely placed in a local folder and run directly in browser, as our texture loader depends on Ajax calls. If you wish to run the program locally, simply call python -m SimpleHTTPServer in the root directory of the project, and then point your browser at localhost:8000. Any other hosting scheme will also work fine.
@@ -38,6 +38,8 @@ You can parametrize the program by providing a custom url.
 
 Custom urls are of the form: boids.com/GLBoids.html?<Boid_Type>_<Num_Boids>
 And you can supply either 'planes' or 'birds' for <Boid_Type> (no quotes) and any positive integer for <Num_Boids>.
+
+Our project can also be seen at 3dboids.com
 
 ACKNOWLEDGEMENTS:
 Baseline code for the GL world adapted from

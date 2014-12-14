@@ -40,99 +40,74 @@ function distance(a, b) {
 }
 
 function initTree(boids) {
+  boids = boids.map(function (x) {
+    x.x = x.position.x;
+    x.y = x.position.y;
+    x.z = x.position.z;
+    return x;
+  });
   return new kdTree(boids, distance, ["x", "y", "z"]);
+}
+
+function getAlignment(boid, neighbors) {
+  var alignment = {x: 0, y: 0, z: 0};
+  for (j in neighbors) {
+    neighbor = neighbors[j][0];
+    if (neighbor == boid) {
+      continue;
+    }
+    alignment = {
+      x: alignment.x + neighbor.rotation.x,
+      y: alignment.y + neighbor.rotation.y,
+      z: alignment.z + neighbor.rotation.z,
+    };
+  }
+  var n = neighbors.length - 1;
+  alignment = {x: alignment.x / n, y: alignment.y / n, z: alignment.z / n, };
+  return alignment;
+}
+
+function getCohesion(boid, neighbors) {
+  var alignment = {x: 0, y: 0, z: 0};
+  for (j in neighbors) {
+    neighbor = neighbors[j][0];
+    if (neighbor == boid) {
+      continue;
+    }
+    alignment = {
+      x: alignment.x + neighbor.rotation.x,
+      y: alignment.y + neighbor.rotation.y,
+      z: alignment.z + neighbor.rotation.z,
+    };
+  }
+  var n = neighbors.length - 1;
+  alignment = {x: alignment.x / n, y: alignment.y / n, z: alignment.z / n, };
+  return alignment;
 }
 
 function nextGeneration(boids) {
   var boidTree = initTree(boids);
+  var newBoids = [];
   for (i in boids) {
+
     var boid = boids[i];
-
-    var boid_pos = boid.localToWorld(boid.position);
-
-    var newBoids = [];
     var neighbors = boidTree.nearest(boid, numBoids, attractionRadius);
+
     if (neighbors.length == 1) {
       newBoids.push({
         x: boid.rotation.x,
         y: boid.rotation.y,
         z: boid.rotation.z,
       });
-      continue
+      continue;
     }
 
-    var cohesion = {x: 0, y: 0, z: 0};
-    var alignment = {x: 0, y: 0, z: 0};
-    var separation = {x: 0, y: 0, z: 0};
-    for (j in neighbors) {
-      neighbor = neighbors[j][0];
-
-      if (neighbor == boid) {
-        continue;
-      }
-
-      var neighbor_pos = neighbor.localToWorld(neighbor.position);
-
-      cohesion.x += neighbor_pos.x;
-      cohesion.y += neighbor_pos.y;
-      cohesion.z += neighbor_pos.z;
-
-      alignment.x += neighbor.rotation.x;
-      alignment.y += neighbor.rotation.y;
-      alignment.z += neighbor.rotation.z;
-
-      if (distance(boid, neighbor) < repulsionRadius) {
-        separation.x += neighbor_pos.x - boid_pos.x;
-        separation.y += neighbor_pos.y - boid_pos.y;
-        separation.z += neighbor_pos.z - boid_pos.z;
-      }
-    }
-
-
-    var n = neighbors.length - 1;
-    cohesion = {
-      x: cohesion.x/n,
-      y: cohesion.y/n,
-      z: cohesion.z/n,
-    };
-    // if (i == 0) console.log(cohesion);
-    alignment = {
-      x: alignment.x/n,
-      y: alignment.y/n,
-      z: alignment.z/n,
-    };
-
-
-
-    separation = {
-      x: separation.x/n - boid.position.x,
-      y: separation.y/n - boid.position.y,
-      z: separation.z/n - boid.position.z,
-    };
-
-    alignment = normalize(alignment);
-    separation = normalize(separation);
-
-    // newDirection = {
-    //   x: (cohesion.x + alignment.x + separation.x)/3,
-    //   y: (cohesion.y + alignment.y + separation.y)/3,
-    //   z: (cohesion.z + alignment.z + separation.z)/3,
-    // }
-
-    newDirection = new THREE.Vector3(cohesion.x, cohesion.y, cohesion.z);
-
-    //newDirection = boid.worldToLocal(newDirection);
-
-    var oldRotation = {x: boid.rotation.x, y: boid.rotation.y, z: boid.rotation.z};
-    boid.lookAt(newDirection, boid.rotation.x);
-    var newRotation = {x: boid.rotation.x, y: boid.rotation.y, z: boid.rotation.z};
-    // console.log(oldRotation, cohesion, newRotation);
-    // console.log(boid.up);
+    var alignment = getAlignment(boid, neighbors);
 
     newBoids.push({
-      x: newDirection.x,
-      y: newDirection.y,
-      z: newDirection.z,
+      x: alignment.x,
+      y: alignment.y,
+      z: alignment.z,
     });
   }
 
@@ -144,10 +119,3 @@ function nextGeneration(boids) {
 }
 
 
-var boids = constructBoids(numBoids);
-// boids = boids.map(function (x) {
-//   x.x = x.position.x;
-//   x.y = x.position.y;
-//   x.z = x.position.z;
-//   return x;
-// });

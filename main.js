@@ -2,29 +2,18 @@ var lastMouseX = 0;
 var lastMouseY = 0;
 var loader = new THREE.ColladaLoader();
 var boids = [];
+var boidsLoaded = false;
+var skyLoaded = false;
 
 function draw3D()  {
   var controls;
 
   function animate() {
-
-    //var boidTree = initTree(boids);
-    //boids = nextGeneration(boids);
-
+    requestAnimationFrame(animate);
+    if (!skyLoaded || !boidsLoaded) return;
 
     for (var i = boids.length - 1; i >= 0; i--) {
-
-        // boids[i].rotateY((Math.random() - .5)/40);
-        // boids[i].rotateX((Math.random() - .5)/40);
-        // boids[i].rotateZ((Math.random() - .3)/40)
-
         boids[i].translateY(-.1);
-
-        // if (i == 2) {
-        //   console.log("X: " +boids[i].position.x);
-        //   console.log("Y: " +boids[i].position.y);
-        //   console.log("Z: " +boids[i].position.z);
-        // }
     };
 
     renderer.render(scene, camera);
@@ -38,9 +27,8 @@ function draw3D()  {
 
     controls.update(clock.getDelta());
     nextGeneration(boids);
-    requestAnimationFrame(animate);
-    return;
   }
+
   function updateControls() {
     controls.update();
   }
@@ -84,8 +72,12 @@ function draw3D()  {
       boids[idx].y = boids[idx].position.y;
       boids[idx].z = boids[idx].position.z;
       boidbox.add(boids[idx]);
+      if (boids.length == numBoids - 1) {
+        boidsLoaded = true;
+      }
     });
   }
+
   boidbox.position.z = 0;
 
   geo = new THREE.PlaneGeometry(0, 0);
@@ -102,6 +94,7 @@ function draw3D()  {
     floor_.rotation.x = -Math.PI;
     floor_.scale.x = floor_.scale.y = floor_.scale.z = 1;
     floor.add(floor_);
+    skyLoaded = true;
   });
 
   var light = new THREE.DirectionalLight(0xe0e0e0);

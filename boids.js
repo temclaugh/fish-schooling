@@ -51,8 +51,8 @@ function initTree(boids) {
 
 function getAlignment(boid, neighbors) {
   var alignment = {x: 0, y: 0, z: 0};
-  for (j in neighbors) {
-    neighbor = neighbors[j][0];
+  for (i in neighbors) {
+    neighbor = neighbors[i][0];
     if (neighbor == boid) {
       continue;
     }
@@ -68,21 +68,21 @@ function getAlignment(boid, neighbors) {
 }
 
 function getCohesion(boid, neighbors) {
-  var alignment = {x: 0, y: 0, z: 0};
-  for (j in neighbors) {
-    neighbor = neighbors[j][0];
+  var cohesion = {x: 0, y: 0, z: 0};
+  for (i in neighbors) {
+    neighbor = neighbors[i][0];
     if (neighbor == boid) {
       continue;
     }
-    alignment = {
-      x: alignment.x + neighbor.rotation.x,
-      y: alignment.y + neighbor.rotation.y,
-      z: alignment.z + neighbor.rotation.z,
+    cohesion = {
+      x: cohesion.x + neighbor.position.x,
+      y: cohesion.y + neighbor.position.y,
+      z: cohesion.z + neighbor.position.z,
     };
   }
   var n = neighbors.length - 1;
-  alignment = {x: alignment.x / n, y: alignment.y / n, z: alignment.z / n, };
-  return alignment;
+  cohesion = {x: cohesion.x / n, y: cohesion.y / n, z: cohesion.z / n, };
+  return cohesion;
 }
 
 function nextGeneration(boids) {
@@ -102,14 +102,16 @@ function nextGeneration(boids) {
       continue;
     }
 
-    var alignment = {x: 0, y: 0, z: 0};
+    // var alignment = boid.rotation;
     var alignment = getAlignment(boid, neighbors);
+    // var cohesion = boid.rotation;
+    var cohesion = getCohesion(boid, neighbors);
+
     newBoids.push({
-      x: boid.position.x + alignment.x,
-      y: boid.position.y + alignment.y,
-      z: boid.position.z + alignment.z,
+      x: (boid.rotation.x + cohesion.x)/2,
+      y: (boid.rotation.y + cohesion.y)/2,
+      z: (boid.rotation.z + cohesion.z)/2,
     });
-    newBoids[newBoids.length - 1]  = normalize(newBoids[newBoids.length - 1]);
   };
 
   for (i in newBoids) {
